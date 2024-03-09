@@ -1,0 +1,22 @@
+services:
+  app:
+    hostname: app
+    build:
+      context: .
+      dockerfile: ./docker/app/Dockerfile
+      target: builder
+    command: air
+    ports:
+      - 8080:8080
+    volumes:
+      - ./:/go/src/app
+  buf-generate:
+    build:
+      context: .
+      dockerfile: ./docker/buf-generate/Dockerfile
+    working_dir: /workspace
+    volumes:
+      - ./:/workspace
+    command: generate
+    profiles:
+      - buf-generate

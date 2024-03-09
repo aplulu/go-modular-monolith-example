@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package example.article.v1;
+
+option go_package = "github.com/aplulu/modular-monolith-example-go/internal/grpc/example/article/v1;article";
+
+message Article {
+  string id = 1;
+  string title = 2;
+  string content = 3;
+  ArticleUser user = 4;
+}
+
+message ArticleUser {
+  string id = 1;
+  string name = 2;
+}
