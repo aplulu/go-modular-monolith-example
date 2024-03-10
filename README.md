@@ -1,15 +1,19 @@
 # modular-monolith-example-go
 
-GoでのModular Monolith及びモジュール間通信のサンプル実装です。
+[Go](https://github.com/aplulu/modular-monolith-example-go) | [TypeScript](https://github.com/aplulu/modular-monolith-example-ts)
 
-モジュール間の通信はgRPC経由で行われますが、ServiceServerとServiceClientをServiceAdapterがReflectionを使用して仲介することにより、ネットワーク接続を介さないgRPCを使ったモジュール間通信を実現しています。
+GoでのModular Monolith及びサービス間通信のサンプル実装です。
+
+サービス間の通信はgRPC経由で行われますが、ServiceServerとServiceClientをServiceAdapterがReflectionを使用して仲介することにより、ネットワーク接続を介さないgRPCを使ったサービス間通信を実現しています。
+
 gRPCのServiceAdapterの実装は `internal/grpc/service_adapter.go` にあります。
 
-また、このサンプルは[Connect](https://connectrpc.com)にも対応しており、外部及び内部の両方での使用が可能です。ただし、Connectを内部のモジュール間通信に使用するためには、Reflectionが使用できないため、ServiceごとにAdapterを作成する必要があります。
-そのため、Connectはフロントエンドとの通信のみに使用し、モジュール間通信にはgRPC (ConnectのgRPC互換ではなく `google.golang.org/grpc` )を使用することを推奨します。
+また、このサンプルは[Connect](https://connectrpc.com)にも対応しており、外部及び内部の両方での使用が可能です。ただし、Connectを内部のサービス間通信に使用するためには、ServiceごとにAdapterを作成する必要があります。
+そのため、Connectはフロントエンドとの通信のみに使用し、サービス間通信にはgRPC (ConnectのgRPC互換ではなく `google.golang.org/grpc` )を使用することを推奨します。
+
 ConnectのServiceAdapterの実装は `internal/grpc/internal_user_adapter.go` にあります。
 
-モジュール間通信にConnectを使用するには、 `compose.yml` 内の環境変数 `INTERNAL_PROTOCOL` を `connect` に設定してください。
+サービス間通信にConnectを使用するには、 `compose.yml` 内の環境変数 `INTERNAL_PROTOCOL` を `connect` に設定してください。
 
 ## 前提環境
 
@@ -44,7 +48,6 @@ $ grpcurl --plaintext localhost:8080 example.article.v1.ArticleService.ListArtic
 
 Connect
 
-http://localhost:8080/example.article.v1.ArticleService/ListArticle?encoding=json&message={}
 ```shell
 $ curl -X POST -H "Content-Type: application/json" -d '{}' http://localhost:8080/example.article.v1.ArticleService/ListArticle
 ```
@@ -55,6 +58,10 @@ Connect (GET)
 $ curl 'http://localhost:8080/example.article.v1.ArticleService/ListArticle?encoding=json&message=\{\}'
 ```
 
+## 未実装や制約項目
+
+* サービス間通信にConnectを使用する場合に、Service Adapterを個別に実装する必要がある。
+  * サービス間通信にはgRPCの方を使った方がよいので、Connectの使用は推奨しない。
 
 ## ディレクトリ構成
 
@@ -67,8 +74,8 @@ $ curl 'http://localhost:8080/example.article.v1.ArticleService/ListArticle?enco
 │       └── main.go // サーバーのエントリーポイント
 ├── docker // Docker関連のファイル
 └── internal
-    ├── components // モジュラモノリスの各モジュール
-    │   ├── article // Articleモジュール
+    ├── components // モジュラモノリスの各サービス
+    │   ├── article // Articleサービス
     │   │   ├── domain // ドメイン層
     │   │   │   ├── model // モデル
     │   │   │   └── repository // リポジトリ
@@ -78,11 +85,10 @@ $ curl 'http://localhost:8080/example.article.v1.ArticleService/ListArticle?enco
     │   │   │   ├── connect // Connectサーバー
     │   │   │   └── grpc // gRPCサーバー
     │   │   └── usecase // ユースケース層
-    │   └── user // ユーザモジュール
+    │   └── user // ユーザサービス
     ├── config // 設定
     ├── grpc
     │   └── example // 自動生成されたgRPCコード
     └── infrastructure
         └── http // HTTPサーバー
-
 ```
