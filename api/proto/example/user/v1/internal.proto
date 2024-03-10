@@ -9,7 +9,9 @@ option go_package = "github.com/aplulu/modular-monolith-example-go/internal/grpc
 // 内部呼び出し用のユーザサービス
 service InternalUserService {
   // ユーザを取得
-  rpc GetUser(GetUserRequest) returns (GetUserResponse);
+  rpc GetUser(GetUserRequest) returns (GetUserResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
 }
 
 message GetUserRequest {

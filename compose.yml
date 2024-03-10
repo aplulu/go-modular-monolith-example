@@ -6,6 +6,8 @@ services:
       dockerfile: ./docker/app/Dockerfile
       target: builder
     command: air
+    environment:
+      INTERNAL_PROTOCOL: grpc # `grpc` or `connect`
     ports:
       - 8080:8080
     volumes:

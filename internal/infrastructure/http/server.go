@@ -9,7 +9,6 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/go-chi/chi/v5"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 	"google.golang.org/grpc"
@@ -24,20 +23,24 @@ var server http.Server
 
 // StartServer starts the server
 func StartServer(logger *slog.Logger) error {
-	httpMux := chi.NewMux()
+	connectMux := http.NewServeMux()
 
 	grpcServer := grpc.NewServer()
 	if config.GRPCReflectionService() {
 		reflection.Register(grpcServer)
 	}
 
-	// Register Modules
+	// gRPC Client
 	internalUserServiceAdapter := appGRPC.NewServiceAdapter()
 	internalUserClient := pbUser.NewInternalUserServiceClient(internalUserServiceAdapter)
 
-	registerUserModule(internalUserServiceAdapter, logger)
+	// Connect Client
+	connectUserAdapter := appGRPC.NewInternalUserAdapter()
 
-	registerArticleModule(grpcServer, logger, internalUserClient)
+	// Register Modules
+	registerUserModule(internalUserServiceAdapter, connectUserAdapter, logger)
+
+	registerArticleModule(grpcServer, connectMux, logger, internalUserClient, connectUserAdapter)
 
 	server = http.Server{
 		Addr: net.JoinHostPort(config.Listen(), config.Port()),
@@ -46,8 +49,8 @@ func StartServer(logger *slog.Logger) error {
 				// gRPC
 				if req.ProtoMajor == 2 && strings.Contains(req.Header.Get("Content-Type"), "application/grpc") {
 					grpcServer.ServeHTTP(w, req)
-				} else {
-					httpMux.ServeHTTP(w, req)
+				} else { // Connect
+					connectMux.ServeHTTP(w, req)
 				}
 			}),
 			&http2.Server{},

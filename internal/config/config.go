@@ -10,6 +10,8 @@ type config struct {
 	Listen                string `envconfig:"listen" default:""`
 	Port                  string `envconfig:"port" default:"8080"`
 	GRPCReflectionService bool   `envconfig:"grpc_reflection_service" default:"true"`
+	// InternalProtocol is the protocol used for internal communication. (grpc or connect)
+	InternalProtocol string `envconfig:"internal_protocol" default:"grpc"`
 }
 
 var conf config
@@ -33,4 +35,8 @@ func Port() string {
 
 func GRPCReflectionService() bool {
 	return conf.GRPCReflectionService
+}
+
+func InternalProtocol() string {
+	return conf.InternalProtocol
 }
