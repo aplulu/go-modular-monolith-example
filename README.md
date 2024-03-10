@@ -74,7 +74,7 @@ $ curl 'http://localhost:8080/example.article.v1.ArticleService/ListArticle?enco
 │       └── main.go // サーバーのエントリーポイント
 ├── docker // Docker関連のファイル
 └── internal
-    ├── components // モジュラモノリスの各サービス
+    ├── component // モジュラモノリスの各サービス
     │   ├── article // Articleサービス
     │   │   ├── domain // ドメイン層
     │   │   │   ├── model // モデル
