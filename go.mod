@@ -3,7 +3,7 @@ module github.com/aplulu/modular-monolith-example-go
 go 1.22
 
 require (
-	github.com/go-chi/chi/v5 v5.0.12
+	github.com/bufbuild/connect-go v1.10.0
 	github.com/kelseyhightower/envconfig v1.4.0
 	golang.org/x/net v0.22.0
 	google.golang.org/grpc v1.62.1

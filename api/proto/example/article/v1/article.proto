@@ -10,7 +10,9 @@ option go_package = "github.com/aplulu/modular-monolith-example-go/internal/grpc
 // 記事サービス
 service ArticleService {
   // ユーザを取得
-  rpc ListArticle(google.protobuf.Empty) returns (ListArticleResponse);
+  rpc ListArticle(google.protobuf.Empty) returns (ListArticleResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
 }
 
 message ListArticleResponse {
